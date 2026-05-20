@@ -4,6 +4,12 @@ import SectorSlider from './components/SectorSlider';
 import MetricCard from './components/MetricCard';
 import SeverityBanner from './components/SeverityBanner';
 import {
+  severityInfo,
+  temperatureInfo,
+  populationInfo,
+  speciesInfo,
+} from './content/projectionInfo';
+import {
   computeOutputs,
   sectors,
   START_YEAR,
@@ -33,7 +39,7 @@ function formatPopSubtitle(pct) {
 }
 
 function App() {
-  const [yearX, setYearX] = useState(END_YEAR);
+  const [yearX, setYearX] = useState(2050);
   const [sectorPositions, setSectorPositions] = useState(INITIAL_SECTOR_POSITIONS);
 
   const outputs = computeOutputs({ yearX, sectorPositions });
@@ -88,23 +94,29 @@ function App() {
             />
           </div>
 
-          <SeverityBanner severity={outputs.severity} />
+          <SeverityBanner severity={outputs.severity} info={severityInfo} />
 
           <div className="metrics__grid">
             <MetricCard
               title="Temperature rise (ΔT)"
               value={`${outputs.effectiveDeltaT.toFixed(2)} °C`}
               subtitle="Relative to 2026"
+              info={temperatureInfo}
+              severityLevel={outputs.severity.level}
             />
             <MetricCard
               title="Additional population exposed to dangerous heat"
               value={`${outputs.popExposedPct.toFixed(1)}%`}
               subtitle={formatPopSubtitle(outputs.popExposedPct)}
+              info={populationInfo}
+              severityLevel={outputs.severity.level}
             />
             <MetricCard
               title="Additional species at very high extinction risk"
               value={`${outputs.speciesLostPct.toFixed(1)}%`}
               subtitle="Beyond 2026 baseline · IPCC AR6 benchmark"
+              info={speciesInfo}
+              severityLevel={outputs.severity.level}
             />
           </div>
           <p className="metrics__detail">
