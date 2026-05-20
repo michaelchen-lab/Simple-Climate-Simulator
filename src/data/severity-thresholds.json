@@ -1,0 +1,31 @@
+{
+  "referenceYear": 2100,
+  "description": "Tiers are fractions of IEA Stated Policies (BAU) additional impacts projected for 2100",
+  "tiers": [
+    {
+      "level": "minimal",
+      "label": "Minimal",
+      "maxFractionOfBau2100": 0.08
+    },
+    {
+      "level": "low",
+      "label": "Low",
+      "maxFractionOfBau2100": 0.25
+    },
+    {
+      "level": "moderate",
+      "label": "Moderate",
+      "maxFractionOfBau2100": 0.5
+    },
+    {
+      "level": "high",
+      "label": "High",
+      "maxFractionOfBau2100": 0.8
+    },
+    {
+      "level": "severe",
+      "label": "Severe",
+      "maxFractionOfBau2100": null
+    }
+  ]
+}

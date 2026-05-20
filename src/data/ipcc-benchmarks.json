@@ -1,0 +1,16 @@
+{
+  "warmingPer1000Gt": 0.45,
+  "population": [
+    { "deltaT": 0, "pct": 0 },
+    { "deltaT": 1.5, "pct": 8.75 },
+    { "deltaT": 2.0, "pct": 25 }
+  ],
+  "species": [
+    { "deltaT": 0, "pct": 0 },
+    { "deltaT": 1.5, "pct": 9 },
+    { "deltaT": 2.0, "pct": 10 },
+    { "deltaT": 3.0, "pct": 12 },
+    { "deltaT": 4.0, "pct": 13 },
+    { "deltaT": 5.0, "pct": 15 }
+  ]
+}
