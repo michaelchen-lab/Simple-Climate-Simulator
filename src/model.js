@@ -104,6 +104,124 @@ export const REFERENCE_2100_BAU = computeCore({
   sectorPositions: BAU_SECTOR_POSITIONS,
 });
 
+/** Palette anchors at tier boundaries (fraction of 2100 BAU warming). */
+const SEVERITY_COLOR_STOPS = [
+  {
+    fraction: 0,
+    background: '#ecfdf5',
+    border: '#6ee7b7',
+    text: '#065f46',
+    accent: '#6ee7b7',
+    pageBackground: '#f4f6f8',
+  },
+  {
+    fraction: 0.08,
+    background: '#f0fdf4',
+    border: '#86efac',
+    text: '#166534',
+    accent: '#86efac',
+    pageBackground: '#ecfdf5',
+  },
+  {
+    fraction: 0.25,
+    background: '#f0fdf4',
+    border: '#86efac',
+    text: '#166534',
+    accent: '#86efac',
+    pageBackground: '#d1fae5',
+  },
+  {
+    fraction: 0.5,
+    background: '#fffbeb',
+    border: '#fcd34d',
+    text: '#92400e',
+    accent: '#fcd34d',
+    pageBackground: '#fef9c3',
+  },
+  {
+    fraction: 0.8,
+    background: '#fff7ed',
+    border: '#fdba74',
+    text: '#9a3412',
+    accent: '#fdba74',
+    pageBackground: '#f97316',
+  },
+  {
+    fraction: 1,
+    background: '#fef2f2',
+    border: '#fca5a5',
+    text: '#991b1b',
+    accent: '#fca5a5',
+    pageBackground: '#ef4444',
+  },
+];
+
+function parseHex(hex) {
+  const h = hex.replace('#', '');
+  return {
+    r: parseInt(h.slice(0, 2), 16),
+    g: parseInt(h.slice(2, 4), 16),
+    b: parseInt(h.slice(4, 6), 16),
+  };
+}
+
+function toHex({ r, g, b }) {
+  const clamp = (n) => Math.max(0, Math.min(255, Math.round(n)));
+  const byte = (n) => clamp(n).toString(16).padStart(2, '0');
+  return `#${byte(r)}${byte(g)}${byte(b)}`;
+}
+
+export function lerpHex(colorA, colorB, t) {
+  const a = parseHex(colorA);
+  const b = parseHex(colorB);
+  const u = Math.max(0, Math.min(1, t));
+  return toHex({
+    r: a.r + (b.r - a.r) * u,
+    g: a.g + (b.g - a.g) * u,
+    b: a.b + (b.b - a.b) * u,
+  });
+}
+
+function interpolateColorStops(stops, fraction, key) {
+  const f = Math.max(0, fraction);
+  if (f <= stops[0].fraction) return stops[0][key];
+  const last = stops[stops.length - 1];
+  if (f >= last.fraction) return last[key];
+
+  for (let i = 0; i < stops.length - 1; i++) {
+    const left = stops[i];
+    const right = stops[i + 1];
+    if (f >= left.fraction && f <= right.fraction) {
+      const span = right.fraction - left.fraction;
+      const t = span > 0 ? (f - left.fraction) / span : 0;
+      return lerpHex(left[key], right[key], t);
+    }
+  }
+
+  return last[key];
+}
+
+/** Continuous severity colors from fraction of 2100 BAU additional warming. */
+export function getSeverityColors(fractionOfBau2100) {
+  const f = Math.max(0, fractionOfBau2100);
+  return {
+    background: interpolateColorStops(SEVERITY_COLOR_STOPS, f, 'background'),
+    border: interpolateColorStops(SEVERITY_COLOR_STOPS, f, 'border'),
+    text: interpolateColorStops(SEVERITY_COLOR_STOPS, f, 'text'),
+    accent: interpolateColorStops(SEVERITY_COLOR_STOPS, f, 'accent'),
+    pageBackground: interpolateColorStops(SEVERITY_COLOR_STOPS, f, 'pageBackground'),
+  };
+}
+
+export function severityColorStyle(colors) {
+  return {
+    '--severity-bg': colors.background,
+    '--severity-border': colors.border,
+    '--severity-text': colors.text,
+    '--severity-accent': colors.accent,
+  };
+}
+
 function buildSeverityResult(tier, fractionOfBau2100, bau2100DeltaT, yearX) {
   const pctOfBau = Math.round(fractionOfBau2100 * 100);
   const descriptions = {
@@ -114,6 +232,8 @@ function buildSeverityResult(tier, fractionOfBau2100, bau2100DeltaT, yearX) {
     severe: `Comparable to or exceeding 2100 stated-policies path (~${pctOfBau}% of BAU)`,
   };
 
+  const colors = getSeverityColors(fractionOfBau2100);
+
   return {
     level: tier.level,
     label: tier.label,
@@ -123,6 +243,7 @@ function buildSeverityResult(tier, fractionOfBau2100, bau2100DeltaT, yearX) {
     referenceYear: severityThresholds.referenceYear,
     bau2100DeltaT,
     yearX,
+    colors,
   };
 }
 

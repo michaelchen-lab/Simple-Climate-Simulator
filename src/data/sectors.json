@@ -1,7 +1,37 @@
 [
-  { "id": "energy", "label": "Energy (power)", "share": 0.39 },
-  { "id": "industry", "label": "Industry", "share": 0.28 },
-  { "id": "transport", "label": "Transportation", "share": 0.16 },
-  { "id": "agriculture", "label": "Agriculture & land", "share": 0.10 },
-  { "id": "buildings", "label": "Buildings & other", "share": 0.07 }
+  {
+    "id": "energy",
+    "label": "Energy (power)",
+    "share": 0.39,
+    "icon": "/energy.avif",
+    "accentColor": "#F59E0B"
+  },
+  {
+    "id": "industry",
+    "label": "Industry",
+    "share": 0.28,
+    "icon": "/industry.jpg",
+    "accentColor": "#64748B"
+  },
+  {
+    "id": "transport",
+    "label": "Transportation",
+    "share": 0.16,
+    "icon": "/transportation.jpg",
+    "accentColor": "#2563EB"
+  },
+  {
+    "id": "agriculture",
+    "label": "Agriculture & land",
+    "share": 0.1,
+    "icon": "/agriculture.jpg",
+    "accentColor": "#16A34A"
+  },
+  {
+    "id": "buildings",
+    "label": "Others",
+    "share": 0.07,
+    "icon": "/buildings.webp",
+    "accentColor": "#0D9488"
+  }
 ]

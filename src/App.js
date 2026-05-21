@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css';
 import SectorSlider from './components/SectorSlider';
 import MetricCard from './components/MetricCard';
+import EmojiMetricValue from './components/EmojiMetricValue';
 import SeverityBanner from './components/SeverityBanner';
 import {
   severityInfo,
@@ -26,11 +27,17 @@ const INITIAL_SECTOR_POSITIONS = {
 };
 
 const GLOBAL_POPULATION_B = 8;
+/** Illustrative pool for absolute count (IPCC: terrestrial & freshwater species). */
+const TERRESTRIAL_FRESHWATER_SPECIES_ESTIMATE = 2_000_000;
 
-function formatPopSubtitle(pct) {
+function celsiusDeltaToFahrenheit(celsius) {
+  return celsius * (9 / 5);
+}
+
+function formatPopulationCount(pct) {
   const peopleB = (pct / 100) * GLOBAL_POPULATION_B;
   if (pct === 0) {
-    return 'No additional exposure at reference year';
+    return '0 additional people';
   }
   if (peopleB >= 1) {
     return `~${peopleB.toFixed(1)} billion additional people`;
@@ -38,11 +45,41 @@ function formatPopSubtitle(pct) {
   return `~${Math.round(peopleB * 1000)} million additional people`;
 }
 
+function formatPopMetricSubtitle(pct) {
+  return `${pct.toFixed(1)}% of total population (${formatPopulationCount(pct)})`;
+}
+
+function formatSpeciesCount(pct) {
+  const n = (pct / 100) * TERRESTRIAL_FRESHWATER_SPECIES_ESTIMATE;
+  if (pct === 0) {
+    return '0 additional species';
+  }
+  if (n >= 1_000_000) {
+    return `~${(n / 1_000_000).toFixed(2)} million species at very high risk`;
+  }
+  if (n >= 1000) {
+    return `~${Math.round(n / 1000).toLocaleString()} thousand species at very high risk`;
+  }
+  return `~${Math.round(n).toLocaleString()} species at very high risk`;
+}
+
+function formatSpeciesMetricSubtitle(pct) {
+  return `${pct.toFixed(1)}% of all species (${formatSpeciesCount(pct)})`;
+}
+
 function App() {
   const [yearX, setYearX] = useState(2050);
   const [sectorPositions, setSectorPositions] = useState(INITIAL_SECTOR_POSITIONS);
 
   const outputs = computeOutputs({ yearX, sectorPositions });
+  const deltaF = celsiusDeltaToFahrenheit(outputs.effectiveDeltaT);
+
+  useEffect(() => {
+    document.body.style.backgroundColor = outputs.severity.colors.pageBackground;
+    return () => {
+      document.body.style.backgroundColor = '';
+    };
+  }, [outputs.severity.colors.pageBackground]);
 
   const updateSector = (id, position) => {
     setSectorPositions((prev) => ({ ...prev, [id]: position }));
@@ -66,6 +103,8 @@ function App() {
               id={sector.id}
               label={sector.label}
               share={sector.share}
+              icon={sector.icon}
+              accentColor={sector.accentColor}
               position={sectorPositions[sector.id]}
               onChange={(value) => updateSector(sector.id, value)}
             />
@@ -99,24 +138,34 @@ function App() {
           <div className="metrics__grid">
             <MetricCard
               title="Temperature rise (ΔT)"
-              value={`${outputs.effectiveDeltaT.toFixed(2)} °C`}
-              subtitle="Relative to 2026"
+              value={`${deltaF.toFixed(2)} °F`}
+              subtitle={`Relative to 2026 (${outputs.effectiveDeltaT.toFixed(2)} °C)`}
               info={temperatureInfo}
-              severityLevel={outputs.severity.level}
+              severityColors={outputs.severity.colors}
             />
             <MetricCard
               title="Additional population exposed to dangerous heat"
-              value={`${outputs.popExposedPct.toFixed(1)}%`}
-              subtitle={formatPopSubtitle(outputs.popExposedPct)}
+              value={
+                <EmojiMetricValue
+                  emoji="🥵"
+                  percent={outputs.popExposedPct}
+                />
+              }
+              subtitle={formatPopMetricSubtitle(outputs.popExposedPct)}
               info={populationInfo}
-              severityLevel={outputs.severity.level}
+              severityColors={outputs.severity.colors}
             />
             <MetricCard
               title="Additional species at very high extinction risk"
-              value={`${outputs.speciesLostPct.toFixed(1)}%`}
-              subtitle="Beyond 2026 baseline · IPCC AR6 benchmark"
+              value={
+                <EmojiMetricValue
+                  emoji="☠️"
+                  percent={outputs.speciesLostPct}
+                />
+              }
+              subtitle={formatSpeciesMetricSubtitle(outputs.speciesLostPct)}
               info={speciesInfo}
-              severityLevel={outputs.severity.level}
+              severityColors={outputs.severity.colors}
             />
           </div>
           <p className="metrics__detail">

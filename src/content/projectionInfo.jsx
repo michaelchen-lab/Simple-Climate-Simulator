@@ -113,8 +113,10 @@ export const populationInfo = (
 export const speciesInfo = (
   <div className="info-tooltip__body">
     <p>
-      Extra share of land and freshwater species at very high extinction risk, above
-      the {START_YEAR} baseline (0% at the reference year).
+      Extra share of <strong>terrestrial and freshwater</strong> species at very high
+      extinction risk — this includes <strong>plants, fungi, invertebrates, and
+      animals</strong>, not animals alone. Counts are above the {START_YEAR} baseline
+      (0% at the reference year).
     </p>
     <p>
       <strong>How it is calculated:</strong>
@@ -125,6 +127,10 @@ export const speciesInfo = (
         Map that warming to a percent at very high risk using IPCC reference points,
         with straight-line steps in between (for example 0% at 0°C extra, about 9% at
         1.5°C extra, about 10% at 2°C extra, rising to about 15% at 5°C extra).
+      </li>
+      <li>
+        The absolute species count is illustrative: percent × about 2 million
+        terrestrial and freshwater species (rough global estimate for this POC).
       </li>
     </ol>
     <p>

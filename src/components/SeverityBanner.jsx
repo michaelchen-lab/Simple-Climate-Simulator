@@ -1,9 +1,11 @@
 import InfoTooltip from './InfoTooltip';
+import { severityColorStyle } from '../model';
 
 export default function SeverityBanner({ severity, info }) {
   return (
     <div
-      className={`severity-banner severity-banner--${severity.level}`}
+      className="severity-banner"
+      style={severityColorStyle(severity.colors)}
       role="status"
       aria-live="polite"
     >
