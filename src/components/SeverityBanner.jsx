@@ -20,7 +20,12 @@ export default function SeverityBanner({ severity, info }) {
           </InfoTooltip>
         )}
       </div>
-      <p className="severity-banner__value">{severity.label}</p>
+      <p className="severity-banner__value">
+        <span className="severity-banner__face" aria-hidden="true">
+          {severity.faceEmoji}
+        </span>
+        {severity.tagline}
+      </p>
       <p className="severity-banner__description">{severity.description}</p>
     </div>
   );

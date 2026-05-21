@@ -2,7 +2,10 @@ import { useEffect, useState } from 'react';
 import './App.css';
 import SectorSlider from './components/SectorSlider';
 import MetricCard from './components/MetricCard';
-import EmojiMetricValue from './components/EmojiMetricValue';
+import EmojiMetricValue, {
+  emojiCountFromPercent,
+  emojiCountFromTenthDegrees,
+} from './components/EmojiMetricValue';
 import SeverityBanner from './components/SeverityBanner';
 import {
   severityInfo,
@@ -26,45 +29,8 @@ const INITIAL_SECTOR_POSITIONS = {
   buildings: SECTOR_SLIDER_CENTER,
 };
 
-const GLOBAL_POPULATION_B = 8;
-/** Illustrative pool for absolute count (IPCC: terrestrial & freshwater species). */
-const TERRESTRIAL_FRESHWATER_SPECIES_ESTIMATE = 2_000_000;
-
 function celsiusDeltaToFahrenheit(celsius) {
   return celsius * (9 / 5);
-}
-
-function formatPopulationCount(pct) {
-  const peopleB = (pct / 100) * GLOBAL_POPULATION_B;
-  if (pct === 0) {
-    return '0 additional people';
-  }
-  if (peopleB >= 1) {
-    return `~${peopleB.toFixed(1)} billion additional people`;
-  }
-  return `~${Math.round(peopleB * 1000)} million additional people`;
-}
-
-function formatPopMetricSubtitle(pct) {
-  return `${pct.toFixed(1)}% of total population (${formatPopulationCount(pct)})`;
-}
-
-function formatSpeciesCount(pct) {
-  const n = (pct / 100) * TERRESTRIAL_FRESHWATER_SPECIES_ESTIMATE;
-  if (pct === 0) {
-    return '0 additional species';
-  }
-  if (n >= 1_000_000) {
-    return `~${(n / 1_000_000).toFixed(2)} million species at very high risk`;
-  }
-  if (n >= 1000) {
-    return `~${Math.round(n / 1000).toLocaleString()} thousand species at very high risk`;
-  }
-  return `~${Math.round(n).toLocaleString()} species at very high risk`;
-}
-
-function formatSpeciesMetricSubtitle(pct) {
-  return `${pct.toFixed(1)}% of all species (${formatSpeciesCount(pct)})`;
 }
 
 function App() {
@@ -88,9 +54,9 @@ function App() {
   return (
     <div className="app">
       <header className="app__header">
-        <h1>Climate Emulator</h1>
+        <h1>all simulation is environmental simulation</h1>
         <p>
-          A proof-of-concept climate emulator. Not 100% accurate!
+          A proof-of-concept educational climate simulator. Not 100% accurate!
         </p>
       </header>
 
@@ -113,6 +79,7 @@ function App() {
 
         <section className="metrics" aria-label="Impact indicators">
           <h2 className="panel-title">Projected impacts</h2>
+          <p className="panel-subtitle">Relative to 2026</p>
 
           <div className="year-slider">
             <div className="year-slider__header">
@@ -138,8 +105,13 @@ function App() {
           <div className="metrics__grid">
             <MetricCard
               title="Temperature rise (ΔT)"
-              value={`${deltaF.toFixed(2)} °F`}
-              subtitle={`Relative to 2026 (${outputs.effectiveDeltaT.toFixed(2)} °C)`}
+              value={
+                <EmojiMetricValue
+                  emoji="🌡️"
+                  label={`${deltaF.toFixed(1)} °F`}
+                  count={emojiCountFromTenthDegrees(deltaF)}
+                />
+              }
               info={temperatureInfo}
               severityColors={outputs.severity.colors}
             />
@@ -148,10 +120,10 @@ function App() {
               value={
                 <EmojiMetricValue
                   emoji="🥵"
-                  percent={outputs.popExposedPct}
+                  label={`${outputs.popExposedPct.toFixed(1)}%`}
+                  count={emojiCountFromPercent(outputs.popExposedPct)}
                 />
               }
-              subtitle={formatPopMetricSubtitle(outputs.popExposedPct)}
               info={populationInfo}
               severityColors={outputs.severity.colors}
             />
@@ -160,20 +132,14 @@ function App() {
               value={
                 <EmojiMetricValue
                   emoji="☠️"
-                  percent={outputs.speciesLostPct}
+                  label={`${outputs.speciesLostPct.toFixed(1)}%`}
+                  count={emojiCountFromPercent(outputs.speciesLostPct)}
                 />
               }
-              subtitle={formatSpeciesMetricSubtitle(outputs.speciesLostPct)}
               info={speciesInfo}
               severityColors={outputs.severity.colors}
             />
           </div>
-          <p className="metrics__detail">
-            Additional cumulative emissions (after {START_YEAR}, through {yearX}):{' '}
-            <strong>{outputs.cumulativeGt.toFixed(0)} Gt CO₂</strong>
-            {' · '}
-            vs. BAU: {(outputs.emissionFactor * 100).toFixed(0)}% of baseline path
-          </p>
         </section>
       </main>
 

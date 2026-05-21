@@ -9,6 +9,23 @@ export const END_YEAR = 2100;
 export const SECTOR_SLIDER_CENTER = 50;
 export { sectors };
 
+/** Face shown before the severity label in the banner. */
+export const SEVERITY_FACE_EMOJI = {
+  minimal: '😊',
+  low: '🙂',
+  moderate: '😐',
+  high: '😠',
+  severe: '🤬',
+};
+
+export const SEVERITY_TAGLINE = {
+  minimal: 'its chill',
+  low: 'its aaight...',
+  moderate: 'not the worst i guess',
+  high: 'this is a problem...',
+  severe: "yea we're cooked",
+};
+
 export const BAU_SECTOR_POSITIONS = Object.fromEntries(
   sectors.map((s) => [s.id, SECTOR_SLIDER_CENTER])
 );
@@ -224,22 +241,16 @@ export function severityColorStyle(colors) {
 
 function buildSeverityResult(tier, fractionOfBau2100, bau2100DeltaT, yearX) {
   const pctOfBau = Math.round(fractionOfBau2100 * 100);
-  const descriptions = {
-    minimal: 'Near 2026 reference — negligible additional impact',
-    low: `Well below 2100 BAU (~${pctOfBau}% of BAU additional warming)`,
-    moderate: `Moderate additional impact (~${pctOfBau}% of 2100 BAU warming)`,
-    high: `Substantial additional impact (~${pctOfBau}% of 2100 BAU warming)`,
-    severe: `Comparable to or exceeding 2100 stated-policies path (~${pctOfBau}% of BAU)`,
-  };
-
   const colors = getSeverityColors(fractionOfBau2100);
 
   return {
     level: tier.level,
     label: tier.label,
+    tagline: SEVERITY_TAGLINE[tier.level] ?? tier.label,
+    faceEmoji: SEVERITY_FACE_EMOJI[tier.level] ?? '😐',
     fractionOfBau2100,
     percentOfBau2100: pctOfBau,
-    description: descriptions[tier.level] ?? tier.label,
+    description: `${tier.label} · ${pctOfBau}% of 2100 BAU warming`,
     referenceYear: severityThresholds.referenceYear,
     bau2100DeltaT,
     yearX,

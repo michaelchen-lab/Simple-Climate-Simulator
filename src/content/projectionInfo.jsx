@@ -7,15 +7,14 @@ const tierRows = severityThresholds.tiers.map((tier) => {
   if (tier.maxFractionOfBau2100 == null) {
     return (
       <li key={tier.level}>
-        <strong>{tier.label}</strong> — worse than about 80% of the policy-as-usual
-        path to 2100
+        <strong>{tier.label}</strong> — worse than about 80% of 2100 BAU warming
       </li>
     );
   }
   const pct = Math.round(tier.maxFractionOfBau2100 * 100);
   return (
     <li key={tier.level}>
-      <strong>{tier.label}</strong> — up to {pct}% of that same reference level
+      <strong>{tier.label}</strong> — up to {pct}% of 2100 BAU warming
     </li>
   );
 });
@@ -28,9 +27,16 @@ export const severityInfo = (
       <strong>Levels (most to least impact):</strong> {tierList.join(' → ')}
     </p>
     <p>
+      <strong>What is “2100 BAU warming”?</strong> BAU means business-as-usual: the
+      IEA <em>Stated Policies</em> (policy-as-usual) emissions path through 2100, with
+      all sector sliders at center (today’s mix). It is the extra global warming above{' '}
+      {START_YEAR} that path would produce by 2100 — about <strong>{bau2100Dt}°C</strong>{' '}
+      in this model. Severity tiers compare your scenario’s extra warming to that
+      reference.
+    </p>
+    <p>
       This summarizes how much <em>extra</em> harm your choices add from {START_YEAR}{' '}
-      through the year you picked, compared with continuing on the IEA stated-policies
-      energy path through 2100.
+      through the year you picked, relative to that 2100 BAU warming.
     </p>
     <ul>{tierRows}</ul>
     <p>
@@ -39,8 +45,8 @@ export const severityInfo = (
     <ol className="info-tooltip__steps">
       <li>Estimate extra warming from your scenario (see Temperature rise).</li>
       <li>
-        Compare that to extra warming if emissions followed stated policies through
-        2100 (~{bau2100Dt}°C above {START_YEAR} with sliders at center).
+        Divide by 2100 BAU warming (~{bau2100Dt}°C above {START_YEAR}) to get a
+        fraction of that reference.
       </li>
       <li>Pick a label from the list above based on that comparison.</li>
     </ol>
