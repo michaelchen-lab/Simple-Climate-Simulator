@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import './App.css';
 import SectorSlider from './components/SectorSlider';
+import DistractionModeButton, {
+  distractionEmbedSrc,
+} from './components/DistractionModeButton';
 import MetricCard from './components/MetricCard';
 import EmojiMetricValue, {
   emojiCountFromPercent,
@@ -36,28 +40,77 @@ function celsiusDeltaToFahrenheit(celsius) {
 function App() {
   const [yearX, setYearX] = useState(2050);
   const [sectorPositions, setSectorPositions] = useState(INITIAL_SECTOR_POSITIONS);
+  const [distractionOpen, setDistractionOpen] = useState(false);
 
   const outputs = computeOutputs({ yearX, sectorPositions });
   const deltaF = celsiusDeltaToFahrenheit(outputs.effectiveDeltaT);
 
   useEffect(() => {
-    document.body.style.backgroundColor = outputs.severity.colors.pageBackground;
+    const desktopQuery = window.matchMedia('(min-width: 768px)');
+
+    const applyBodyMode = () => {
+      const pageBg = outputs.severity.colors.pageBackground;
+
+      if (distractionOpen) {
+        document.documentElement.classList.add('distraction-mode');
+        document.body.classList.add('distraction-mode');
+        document.body.style.backgroundColor = desktopQuery.matches
+          ? 'transparent'
+          : pageBg;
+        return;
+      }
+
+      document.documentElement.classList.remove('distraction-mode');
+      document.body.classList.remove('distraction-mode');
+      document.body.style.backgroundColor = pageBg;
+    };
+
+    applyBodyMode();
+    desktopQuery.addEventListener('change', applyBodyMode);
+
     return () => {
+      desktopQuery.removeEventListener('change', applyBodyMode);
+      document.documentElement.classList.remove('distraction-mode');
+      document.body.classList.remove('distraction-mode');
       document.body.style.backgroundColor = '';
     };
-  }, [outputs.severity.colors.pageBackground]);
+  }, [distractionOpen, outputs.severity.colors.pageBackground]);
 
   const updateSector = (id, position) => {
     setSectorPositions((prev) => ({ ...prev, [id]: position }));
   };
 
+  const distractionBackdrop =
+    distractionOpen &&
+    createPortal(
+      <div className="distraction-backdrop" aria-hidden="true">
+        <iframe
+          src={distractionEmbedSrc()}
+          title="Distraction background video"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerPolicy="strict-origin-when-cross-origin"
+          tabIndex={-1}
+        />
+      </div>,
+      document.body
+    );
+
   return (
     <div className="app">
-      <header className="app__header">
-        <h1>all simulation is environmental simulation</h1>
-        <p>
-          A proof-of-concept educational climate simulator. Not 100% accurate!
-        </p>
+      {distractionBackdrop}
+      <header
+        className={`app__header${distractionOpen ? ' app__header--distraction' : ''}`}
+      >
+        <div className="app__header__text">
+          <h1>all simulation is environmental simulation</h1>
+          <p>
+            A proof-of-concept educational climate simulator. Not 100% accurate!
+          </p>
+        </div>
+        <DistractionModeButton
+          distractionOpen={distractionOpen}
+          onToggle={() => setDistractionOpen((open) => !open)}
+        />
       </header>
 
       <main className="app__main">

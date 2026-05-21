@@ -1,12 +1,112 @@
 .app {
+  position: relative;
   max-width: 1100px;
   margin: 0 auto;
   padding: 1.5rem;
 }
 
+.distraction-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background: #000;
+}
+
+.distraction-backdrop iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  pointer-events: none;
+}
+
+@media (min-width: 768px) {
+  .distraction-backdrop iframe {
+    top: 50%;
+    left: 50%;
+    width: 100vw;
+    height: 56.25vw;
+    min-height: 100vh;
+    min-width: 177.78vh;
+    inset: auto;
+    transform: translate(-50%, -50%);
+  }
+}
+
+@media (max-width: 767px) {
+  html.distraction-mode,
+  body.distraction-mode {
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  body.distraction-mode {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+    margin: 0;
+  }
+
+  body.distraction-mode #root {
+    grid-row: 1;
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    z-index: 1;
+    isolation: isolate;
+    background: inherit;
+  }
+
+  body.distraction-mode .distraction-backdrop {
+    grid-row: 2;
+    position: relative;
+    inset: auto;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    z-index: 1;
+    overflow: hidden;
+    pointer-events: auto;
+  }
+}
+
+.app__header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
+}
+
+.app__header__text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.35rem;
+}
+
 .app__header h1 {
-  margin: 0 0 0.5rem;
+  margin: 0;
   font-size: 1.75rem;
+  line-height: 1.25;
 }
 
 .app__header p {
@@ -14,7 +114,65 @@
   color: #4a5568;
 }
 
+@media (min-width: 768px) {
+  .app__header--distraction h1,
+  .app__header--distraction p {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.4rem 0.65rem;
+    background: #e2e8f0;
+    border-radius: 6px;
+  }
+}
+
+.distraction-mode-btn {
+  flex: 0 0 auto;
+  width: max-content;
+  align-self: flex-end;
+  padding: 0.5rem 0.85rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  background: #fff;
+  color: #1e293b;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: 'Public Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.25;
+  white-space: nowrap;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.distraction-mode-btn:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.distraction-mode-btn:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+@media (min-width: 768px) {
+  .app__header {
+    flex-direction: row;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .distraction-mode-btn {
+    align-self: center;
+    margin-left: auto;
+  }
+}
+
 .app__main {
+  position: relative;
+  z-index: 1;
   display: grid;
   gap: 2rem;
   margin-top: 2rem;
@@ -29,6 +187,8 @@
 
 .controls,
 .metrics {
+  position: relative;
+  z-index: 1;
   background: #fff;
   border-radius: 8px;
   padding: 1.25rem;
@@ -433,6 +593,8 @@ input[type='range'] {
 }
 
 .app__footer {
+  position: relative;
+  z-index: 1;
   margin-top: 2rem;
   padding-top: 1rem;
   font-size: 0.8rem;
